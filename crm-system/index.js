@@ -108,6 +108,25 @@ app.post("/claim-coupon", async (req, res) => {
   }
 });
 
+// 近 30 天消費金額超過 500 元的客戶
+app.get("/customers/high-spenders", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT c.CustomerID, c.Name, SUM(p.PurchaseAmount) AS TotalAmount, MAX(p.PurchaseDate) AS LastPurchaseDate
+      FROM Customers c
+      JOIN PurchaseHistory p ON c.CustomerID = p.CustomerID
+      WHERE p.PurchaseDate >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+      GROUP BY c.CustomerID, c.Name
+      HAVING TotalAmount > 500;
+    `);
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("無法篩選客戶");
+  }
+});
+
+
 // 啟動伺服器
 const PORT = 3000;
 app.listen(PORT, () => {
