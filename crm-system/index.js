@@ -126,6 +126,50 @@ app.get("/customers/high-spenders", async (req, res) => {
   }
 });
 
+// 動態變數替換函數
+const replaceTemplateVariables = (template, data) => {
+  return template.replace(/\{(\w+)\}/g, (match, key) => data[key] || match);
+};
+
+// 生成簡訊範本 API
+app.get('/generate-sms', async (req, res) => {
+  try {
+    // 1. 篩選符合條件的客戶
+    const [customers] = await db.query(`
+      SELECT c.CustomerID, c.Name, SUM(p.PurchaseAmount) AS TotalAmount
+      FROM Customers c
+      JOIN PurchaseHistory p ON c.CustomerID = p.CustomerID
+      WHERE p.PurchaseDate >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+      GROUP BY c.CustomerID, c.Name
+      HAVING TotalAmount > 500;
+    `);
+
+    // 2. 讀取簡訊範本
+    const [templateResult] = await db.query(`
+      SELECT TemplateContent FROM MessageTemplates WHERE TemplateName = 'MarketingTemplate';
+    `);
+    const template = templateResult[0].TemplateContent;
+
+    // 3. 為每位客戶生成簡訊內容
+    const messages = customers.map(customer => {
+      return {
+        customerID: customer.CustomerID,
+        name: customer.Name,
+        totalAmount: customer.TotalAmount,
+        message: replaceTemplateVariables(template, {
+          Name: customer.Name,
+          TotalAmount: customer.TotalAmount,
+        }),
+      };
+    });
+
+    // 4. 返回生成的簡訊內容
+    res.json(messages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('生成簡訊內容時發生錯誤');
+  }
+});
 
 // 啟動伺服器
 const PORT = 3000;

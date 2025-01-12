@@ -1,6 +1,24 @@
-CREATE DATABASE IF NOT EXISTS crm;
+-- 設置資料庫默認字符集
+CREATE DATABASE IF NOT EXISTS crm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE crm;
+
+-- 確保所有客戶端連接使用 utf8mb4
+SET NAMES 'utf8mb4';
+
+-- 新增 MessageTemplates 表
+CREATE TABLE IF NOT EXISTS MessageTemplates (
+    TemplateID INT AUTO_INCREMENT PRIMARY KEY,
+    TemplateName VARCHAR(100) NOT NULL,
+    TemplateContent TEXT NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 插入測試範本數據
+INSERT INTO MessageTemplates (TemplateName, TemplateContent) 
+VALUES 
+('MarketingTemplate', '您好，{Name}，您在過去 30 天內的消費金額為 {TotalAmount} 元！感謝您的支持，期待您的再次光臨！');
+
 
 -- Customers 表
 CREATE TABLE Customers (
