@@ -1,0 +1,21 @@
+# Node.js 依賴（在 Docker 中重建）
+node_modules/
+
+# Git 相關文件
+.git/
+.gitignore
+
+# 日誌文件
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# 環境變數文件
+.env
+
+# 編輯器臨時文件
+*.swp
+.DS_Store
+
+# Docker compose 相關
+docker-compose.override.yml

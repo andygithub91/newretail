@@ -1,0 +1,22 @@
+# Node.js 依賴
+node_modules/
+
+# 日誌文件
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# 環境變數文件
+.env
+
+# Docker 相關
+docker-compose.override.yml
+*.dockerfile
+
+# 暫存文件
+*.swp
+.DS_Store
+
+# 本地開發工具配置
+.vscode/
+.idea/
